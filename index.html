@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yamaha Projects — Performance Dashboard</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --inset: #f4f6fb;
+      --line: #e2e4ea;
+      --line-soft: #eceef3;
+      --text: #161616;
+      --muted: #5c6370;
+      --dim: #6b7280;
+      --yamaha: #263692;
+      --yamaha-line: #263692;
+      --yamaha-wash: rgba(38, 54, 146, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    button, input { font-family: inherit; }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 28px 28px 64px;
+    }
+
+    header.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 18px;
+      border-bottom: 3px solid var(--yamaha);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+    }
+
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+    }
+
+    .brand-copy strong {
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-copy span,
+    .period {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .period { text-align: right; }
+
+    nav.tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 6px;
+      margin-top: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    nav.tabs button {
+      appearance: none;
+      background: transparent;
+      color: var(--muted);
+      border: 0;
+      border-bottom: 2px solid transparent;
+      padding: 12px 16px 11px;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    nav.tabs button:hover { color: var(--text); }
+
+    nav.tabs button[aria-selected="true"] {
+      color: var(--yamaha);
+      background: var(--yamaha-wash);
+      border-bottom-color: var(--yamaha);
+    }
+
+    nav.tabs button:focus-visible {
+      outline: 2px solid var(--yamaha-line);
+      outline-offset: -2px;
+    }
+
+    .note {
+      margin: 14px 0 0;
+      color: var(--dim);
+      font-size: 12.5px;
+    }
+
+    .slide-title {
+      margin: 34px 0 14px;
+      font-size: 22px;
+      font-weight: 650;
+      letter-spacing: -0.015em;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 22px 24px 20px;
+    }
+
+    .card + .card,
+    .block + .block { margin-top: 16px; }
+
+    .kicker {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .subhead {
+      margin: 8px 0 0;
+      color: var(--text);
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    .filterbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--yamaha);
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pills button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .pills button:hover { border-color: var(--yamaha); color: var(--yamaha); }
+
+    .pills button[aria-pressed="true"] {
+      background: var(--yamaha);
+      border-color: var(--yamaha);
+      color: #fff;
+    }
+
+    .pills button:focus-visible {
+      outline: 2px solid var(--yamaha);
+      outline-offset: 2px;
+    }
+
+    .sample {
+      margin-left: auto;
+      color: var(--dim);
+      font-size: 12.5px;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .kpi {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 14px 12px;
+      background: #fafbfe;
+    }
+
+    .kpi-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .kpi-value {
+      margin: 8px 0 0;
+      font-size: 28px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-value.up { color: #17663a; }
+    .kpi-value.down { color: #9f2d2d; }
+
+    .kpi-note {
+      margin: 6px 0 0;
+      color: var(--dim);
+      font-size: 13px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px 40px;
+      margin-top: 18px;
+    }
+
+    .col h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .col .ask {
+      margin: 4px 0 10px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .takeaways ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .takeaways li { margin: 6px 0; }
+
+    .meter { margin: 0 0 12px; }
+
+    .meter-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .meter-top strong { font-variant-numeric: tabular-nums; }
+
+    .track {
+      margin-top: 6px;
+      height: 6px;
+      background: #e7e9f2;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: var(--yamaha);
+      border-radius: 99px;
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 22px 0 10px;
+      font-size: 13.5px;
+    }
+
+    .chart-head span { color: var(--muted); }
+
+    .chart {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      align-items: end;
+    }
+
+    .bar-col {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      color: var(--dim);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .bar-val {
+      display: block;
+      text-align: center;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+
+    .bar-track {
+      display: flex;
+      align-items: flex-end;
+      height: 92px;
+      background: #f3f5fa;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      display: block;
+      width: 100%;
+      background: #c5cce8;
+    }
+
+    .bar-col.on .bar-fill { background: var(--yamaha); }
+    .bar-col.on .bar-val,
+    .bar-col.on { color: var(--yamaha); }
+
+    .bar-name { display: block; text-align: center; margin-top: 6px; }
+
+    .rank { list-style: none; margin: 12px 0 0; padding: 0; }
+
+    .rank li {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 8px;
+      align-items: baseline;
+      padding: 7px 0;
+      border-top: 1px solid var(--line-soft);
+      font-size: 14px;
+    }
+
+    .rank .n { color: var(--dim); font-variant-numeric: tabular-nums; }
+    .rank .val { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .insight {
+      margin: 18px 0 0;
+      padding-top: 14px;
+      border-top: 1px solid var(--line-soft);
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .insight strong { color: var(--text); font-weight: 650; }
+
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .inset {
+      background: var(--inset);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 16px 16px 14px;
+    }
+
+    .inset .ico {
+      color: var(--yamaha);
+      margin-bottom: 10px;
+    }
+
+    .inset h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .inset p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .inset .foot {
+      margin-top: 12px;
+      color: var(--text);
+      font-size: 13.5px;
+      font-weight: 650;
+    }
+
+    .section-title {
+      margin: 28px 0 12px;
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0 0 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      width: 88px;
+      text-align: right;
+      padding-right: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .promo .stat {
+      margin: 10px 0 0;
+      font-size: 26px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+    }
+
+    td {
+      padding: 14px 12px 14px 0;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+    }
+
+    td:first-child { font-weight: 650; white-space: nowrap; }
+
+    .promos {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .promo {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 16px 18px;
+      background: #ffffff;
+      min-height: 132px;
+    }
+
+    .promo .ico { color: var(--yamaha); margin-bottom: 12px; }
+
+    .promo h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .promo p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .takeaways li { color: var(--text); }
+
+    svg { display: block; }
+
+    @media (max-width: 720px) {
+      .wrap { padding: 18px 16px 48px; }
+      header.top { align-items: flex-start; flex-direction: column; gap: 12px; }
+      .period { text-align: left; }
+      .brand-copy { border-left: 0; padding-left: 0; }
+      .kpis, .split, .pair, .promos { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .sample { margin-left: 0; }
+      .chart { gap: 4px; }
+      .kpi-value { font-size: 24px; }
+      td:first-child { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <img src="yamaha-logo-mark.png" alt="Yamaha" />
+        <div class="brand-copy">
+          <strong>Projects Performance Dashboard</strong>
+          <span>Five program reviews in one pack</span>
+        </div>
+      </div>
+      <div class="period" id="period-label">October 2026<br />Year-on-year growth</div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Yamaha projects" id="tabs"></nav>
+    <div class="filterbar">
+      <span class="filter-label">Month</span>
+      <div class="pills" id="pills" role="group" aria-label="Month filter"></div>
+      <span class="sample">Sample data for review</span>
+    </div>
+
+    <div id="root"></div>
+  </div>
+
+  <script>
+    const ICONS = {
+      trophy: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 4h8v3a4 4 0 0 1-8 0V4z"/><path d="M8 6H5.5A2.5 2.5 0 0 0 8 10"/><path d="M16 6h2.5A2.5 2.5 0 0 1 16 10"/><path d="M12 11v3"/><path d="M9 20h6"/><path d="M10 17h4l-1 3h-2l-1-3z"/></svg>',
+      bars: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 19V10"/><path d="M12 19V5"/><path d="M19 19v-7"/></svg>',
+      calendar: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',
+      tag: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 4H6a2 2 0 0 0-2 2v6l8.5 8.5a2 2 0 0 0 2.8 0l5.2-5.2a2 2 0 0 0 0-2.8L12 4z"/><circle cx="8.5" cy="8.5" r="1"/></svg>',
+      handshake: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 13l2.2 2.2a2 2 0 0 0 2.8 0L16 12"/><path d="M4 12l3-3 3 2 3-4 3 2 4-2"/><path d="M3 15l3 3M21 15l-3 3"/></svg>'
+    };
+
+    const MONTHS = [
+      { id: "2026-04", short: "Apr", name: "April 2026", ly: "April 2025" },
+      { id: "2026-05", short: "May", name: "May 2026", ly: "May 2025" },
+      { id: "2026-06", short: "Jun", name: "June 2026", ly: "June 2025" },
+      { id: "2026-07", short: "Jul", name: "July 2026", ly: "July 2025" },
+      { id: "2026-08", short: "Aug", name: "August 2026", ly: "August 2025" },
+      { id: "2026-09", short: "Sep", name: "September 2026", ly: "September 2025" },
+      { id: "2026-10", short: "Oct", name: "October 2026", ly: "October 2025", partial: true }
+    ];
+
+    const PERIODS = [
+      { id: "fytd", label: "FY to date", name: "April–October 2026", ly: "April–October 2025", ids: MONTHS.map((m) => m.id) },
+      { id: "q2", label: "Jul–Sep", name: "July–September 2026", ly: "July–September 2025", ids: ["2026-07", "2026-08", "2026-09"] },
+      ...MONTHS.map((m) => ({ id: m.id, label: m.short, name: m.name, ly: m.ly, ids: [m.id], partial: !!m.partial }))
+    ];
+
+    const PROJECTS = [
+      {
+        id: "tie-up",
+        tab: "Tie-Up",
+        slide1: "Slide 1: Tie-Up — Performance & Partner Insights",
+        slide2: "Slide 2: Partner Performance & Promotional Effectiveness",
+        program: "Tie-Up Program",
+        profile: "Partner & Model Profile",
+        activation: "Partner Performance & Activation",
+        unit: "placements",
+        lifetimeBase: 1240,
+        lifetimeLabel: "Total tie-ups to date",
+        periodLabel: "Placements in period",
+        volume: [[86, 72], [94, 78], [110, 81], [128, 90], [142, 96], [136, 101], [74, 88]],
+        leftTitle: "Tie-Up Partner Type",
+        leftAsk: "Which partners are driving placements?",
+        left: ["Corporate and institutional", "Campus and community", "Fleet and bulk buyers"],
+        leftW: [[0.44, 0.34, 0.22], [0.42, 0.35, 0.23], [0.40, 0.33, 0.27], [0.38, 0.31, 0.31], [0.35, 0.29, 0.36], [0.37, 0.30, 0.33], [0.43, 0.34, 0.23]],
+        rightTitle: "Yamaha Model Placed",
+        rightAsk: "Which bikes move through the tie-up?",
+        rightNoun: "model group",
+        right: ["FZS and commuter", "R15 and premium sport", "RayZR and scooter"],
+        rightW: [[0.50, 0.30, 0.20], [0.48, 0.32, 0.20], [0.46, 0.34, 0.20], [0.44, 0.36, 0.20], [0.40, 0.40, 0.20], [0.42, 0.38, 0.20], [0.47, 0.33, 0.20]],
+        topTitle: "Top-performing partners",
+        topFoot: "Top 5 partner accounts",
+        top: ["Grameenphone Fleet", "BRAC University", "Square Group", "Dhaka College", "Banglalink Corporate"],
+        topW: [0.19, 0.15, 0.12, 0.10, 0.08],
+        lowTitle: "Low / non-performing partners",
+        low: ["North City Campus", "Riverside Fleet", "Old Town Institute", "West End Tie-up", "Harbor Campus"],
+        lowCounts: [[2, 1, 1, 0, 0], [1, 2, 0, 1, 0], [2, 1, 0, 0, 1], [1, 1, 2, 0, 0], [0, 1, 1, 2, 0], [1, 0, 2, 1, 0], [1, 0, 0, 1, 2]],
+        classTitle: "Partner Performance Classification",
+        classHigh: "Strong placement volume and regular activity",
+        classLow: "Very low volume for the length of the period",
+        classNone: "Zero placements during the selected period",
+        promos(current, months) {
+          const events = Math.max(months, Math.round(current / 24));
+          return [
+            ["calendar", "Joint activations", fmt(events), Math.min(8, Math.max(2, Math.round(current / 40))) + " cities · " + fmt(Math.round(current * 1.15)) + " enquiries"],
+            ["tag", "Co-branded offers", fmt(Math.round(current * 0.47)), "Claims logged in the period"],
+            ["handshake", "Partner support", bdt(current * 4600), Math.max(6, Math.round(current / 7)) + " partners responded"]
+          ];
+        },
+        closing(current) {
+          return "Co-branded claims were " + fmt(Math.round(current * 0.47)) + " against " + fmt(current) + " placements. Check cost per placement before extending the offer.";
+        }
+      },
+      {
+        id: "local-mechanics",
+        tab: "Local Mechanics",
+        slide1: "Slide 1: Local Mechanics — Performance & Workshop Insights",
+        slide2: "Slide 2: Workshop Performance & Support Effectiveness",
+        program: "Local Mechanics Program",
+        profile: "Workshop & Service Profile",
+        activation: "Workshop Performance & Activation",
+        unit: "jobs",
+        lifetimeBase: 8640,
+        lifetimeLabel: "Mechanics enrolled to date",
+        lifetimeValue: 612,
+        periodLabel: "Jobs and parts lines",
+        volume: [[410, 355], [438, 370], [462, 388], [510, 402], [548, 420], [536, 431], [390, 410]],
+        leftTitle: "Mechanic Network",
+        leftAsk: "Who is active in the program?",
+        left: ["Independent workshop owners", "Multi-brand service points", "Yamaha-focused mechanics"],
+        leftW: [[0.46, 0.32, 0.22], [0.44, 0.33, 0.23], [0.42, 0.32, 0.26], [0.40, 0.31, 0.29], [0.38, 0.30, 0.32], [0.39, 0.30, 0.31], [0.43, 0.33, 0.24]],
+        rightTitle: "Service & Parts Mix",
+        rightAsk: "What work is coming through the network?",
+        rightNoun: "service line",
+        right: ["General service", "Genuine parts attached", "Repeat workshop jobs"],
+        rightW: [[0.48, 0.30, 0.22], [0.46, 0.32, 0.22], [0.44, 0.33, 0.23], [0.42, 0.34, 0.24], [0.40, 0.36, 0.24], [0.41, 0.35, 0.24], [0.45, 0.33, 0.22]],
+        topTitle: "Top-performing workshops",
+        topFoot: "Top 5 mechanic points",
+        top: ["Gulshan Bike Care", "Mirpur Two-Wheeler", "Uttara Moto House", "Chittagong Workshop 4", "Sylhet Gear Point"],
+        topW: [0.16, 0.13, 0.11, 0.09, 0.08],
+        lowTitle: "Low / non-performing workshops",
+        low: ["Barisal Lane Garage", "Rangpur Multi-brand", "Khulna Old Stand", "Jamalpur Cycle", "Pabna Corner Shop"],
+        lowCounts: [[2, 2, 1, 0, 0], [1, 2, 1, 1, 0], [2, 1, 0, 0, 1], [1, 1, 2, 0, 0], [0, 2, 1, 1, 0], [1, 0, 2, 1, 0], [1, 0, 0, 0, 1]],
+        classTitle: "Workshop Performance Classification",
+        classHigh: "Strong job volume and regular genuine-parts offtake",
+        classLow: "Very low job count for the length of the period",
+        classNone: "Zero jobs during the selected period",
+        promos(current, months) {
+          const camps = Math.max(months, Math.round(current / 180));
+          return [
+            ["calendar", "Training camps", fmt(camps), fmt(Math.round(current * 0.35)) + " mechanics attended"],
+            ["tag", "Parts schemes", fmt(Math.round(current * 0.62)), "Genuine-parts lines in the period"],
+            ["handshake", "Mechanic incentives", bdt(current * 850), Math.max(20, Math.round(current / 12)) + " workshops responded"]
+          ];
+        },
+        closing(current) {
+          return "Genuine-parts lines were " + fmt(Math.round(current * 0.62)) + " against " + fmt(current) + " jobs. Hold the scheme only where attachment stays with the job.";
+        }
+      },
+      {
+        id: "pulse-card",
+        tab: "Pulse Card",
+        slide1: "Slide 1: Pulse Card — Performance & Cardholder Insights",
+        slide2: "Slide 2: Outlet Performance & Offer Effectiveness",
+        program: "Pulse Card Program",
+        profile: "Cardholder & Redemption Profile",
+        activation: "Outlet Performance & Activation",
+        unit: "redemptions",
+        lifetimeBase: 15480,
+        lifetimeValue: 18640,
+        lifetimeLabel: "Cards issued to date",
+        periodLabel: "Redemptions in period",
+        volume: [[620, 540], [680, 560], [710, 590], [760, 610], [820, 640], [790, 655], [510, 600]],
+        leftTitle: "Cardholder Base",
+        leftAsk: "Who is redeeming the card?",
+        left: ["New card enrollments", "Repeat Yamaha customers", "Lapsed cardholders reactivated"],
+        leftW: [[0.34, 0.48, 0.18], [0.32, 0.50, 0.18], [0.30, 0.50, 0.20], [0.28, 0.51, 0.21], [0.26, 0.52, 0.22], [0.27, 0.51, 0.22], [0.31, 0.50, 0.19]],
+        rightTitle: "Redemption Mix",
+        rightAsk: "What are cardholders redeeming?",
+        rightNoun: "benefit",
+        right: ["Service benefits", "Parts benefits", "Accessory benefits"],
+        rightW: [[0.46, 0.36, 0.18], [0.44, 0.37, 0.19], [0.42, 0.38, 0.20], [0.41, 0.38, 0.21], [0.39, 0.40, 0.21], [0.40, 0.39, 0.21], [0.44, 0.38, 0.18]],
+        topTitle: "Top-performing outlets",
+        topFoot: "Top 5 dealer points",
+        top: ["Yamaha Banani", "Yamaha Dhanmondi", "Yamaha Agrabad", "Yamaha Sylhet Point", "Yamaha Bogura"],
+        topW: [0.18, 0.15, 0.12, 0.10, 0.08],
+        lowTitle: "Low / non-performing outlets",
+        low: ["Yamaha Narayanganj", "Yamaha Tangail", "Yamaha Kushtia", "Yamaha Cox's Bazar", "Yamaha Dinajpur"],
+        lowCounts: [[4, 2, 1, 0, 0], [3, 2, 2, 1, 0], [2, 1, 0, 0, 2], [2, 2, 3, 0, 0], [1, 2, 1, 2, 0], [2, 0, 3, 1, 0], [1, 0, 0, 1, 2]],
+        classTitle: "Outlet Performance Classification",
+        classHigh: "Strong issuance, redemption and regular repeat use",
+        classLow: "Very low redemption count for the length of the period",
+        classNone: "Zero redemptions during the selected period",
+        promos(current, months) {
+          const drives = Math.max(months, Math.round(current / 220));
+          return [
+            ["calendar", "Enrollment drives", fmt(drives), fmt(Math.round(current * 0.42)) + " cards issued"],
+            ["tag", "Cardholder offers", fmt(Math.round(current * 0.55)), "Offer claims in the period"],
+            ["handshake", "Dealer commission", bdt(current * 320), Math.max(8, Math.round(current / 80)) + " outlets responded"]
+          ];
+        },
+        closing(current) {
+          return "Offer claims were " + fmt(Math.round(current * 0.55)) + " against " + fmt(current) + " redemptions. Keep the offer where repeat use is rising with it.";
+        }
+      },
+      {
+        id: "influencer",
+        tab: "Influencer",
+        slide1: "Slide 1: Influencer — Performance & Creator Insights",
+        slide2: "Slide 2: Creator Performance & Campaign Effectiveness",
+        program: "Influencer Program",
+        profile: "Creator & Content Profile",
+        activation: "Creator Performance & Activation",
+        unit: "deliveries",
+        lifetimeBase: 410,
+        lifetimeLabel: "Creators engaged to date",
+        lifetimeValue: 86,
+        periodLabel: "Delivered posts and videos",
+        volume: [[28, 22], [31, 24], [36, 25], [42, 30], [48, 32], [45, 34], [22, 29]],
+        leftTitle: "Creator Mix",
+        leftAsk: "Who is carrying the program?",
+        left: ["Mega and macro creators", "Micro and local creators", "Yamaha owners and riders"],
+        leftW: [[0.28, 0.46, 0.26], [0.26, 0.48, 0.26], [0.24, 0.48, 0.28], [0.22, 0.50, 0.28], [0.20, 0.50, 0.30], [0.21, 0.49, 0.30], [0.25, 0.48, 0.27]],
+        rightTitle: "Content & Model Mix",
+        rightAsk: "What is being published, and on which bikes?",
+        rightNoun: "content group",
+        right: ["FZS content", "R15 content", "Other Yamaha models"],
+        rightW: [[0.42, 0.34, 0.24], [0.40, 0.36, 0.24], [0.38, 0.38, 0.24], [0.36, 0.40, 0.24], [0.34, 0.42, 0.24], [0.35, 0.41, 0.24], [0.40, 0.36, 0.24]],
+        topTitle: "Top-performing creators",
+        topFoot: "Top 5 creator accounts",
+        top: ["Rider Rahat", "Dhaka Lane", "Gear Talk BD", "Night Shift Moto", "FZS Diary"],
+        topW: [0.18, 0.15, 0.13, 0.11, 0.09],
+        lowTitle: "Low / non-performing creators",
+        low: ["Campus Clip", "Two Stroke Notes", "Weekend Throttle", "City Loop BD", "Spare Reel"],
+        lowCounts: [[1, 1, 0, 0, 0], [1, 0, 1, 0, 0], [2, 1, 0, 0, 1], [1, 1, 1, 0, 0], [0, 1, 1, 1, 0], [1, 0, 2, 0, 0], [0, 0, 0, 1, 1]],
+        classTitle: "Creator Performance Classification",
+        classHigh: "Strong delivery volume and regular on-brief activity",
+        classLow: "Very low output for the length of the period",
+        classNone: "Zero deliveries during the selected period",
+        promos(current, months) {
+          const waves = Math.max(1, Math.round(current / 16));
+          return [
+            ["calendar", "Content waves", fmt(Math.max(waves, months > 1 ? waves : 1)), Math.min(4, Math.max(2, waves)) + " platforms · " + fmt(current) + " deliveries"],
+            ["tag", "Paid collaborations", fmt(Math.round(current * 0.7)), fmt(Math.round(current * 42000)) + " qualified views"],
+            ["handshake", "Creator fees", bdt(current * 18000), Math.max(4, Math.round(current / 4)) + " creators paid"]
+          ];
+        },
+        closing(current) {
+          return "Paid collaborations covered " + fmt(Math.round(current * 0.7)) + " of " + fmt(current) + " deliveries. Shift the next wave toward creators who delivered on time.";
+        }
+      },
+      {
+        id: "kizuna",
+        tab: "Kizuna",
+        slide1: "Slide 1: Kizuna — Performance & Member Insights",
+        slide2: "Slide 2: Chapter Performance & Activity Effectiveness",
+        program: "Kizuna Program",
+        profile: "Member & Engagement Profile",
+        activation: "Chapter Performance & Activation",
+        unit: "touchpoints",
+        lifetimeBase: 260,
+        lifetimeLabel: "Members to date",
+        lifetimeValue: 1840,
+        periodLabel: "Meets, rides and touchpoints",
+        volume: [[18, 14], [21, 16], [24, 17], [32, 20], [38, 22], [36, 23], [15, 19]],
+        leftTitle: "Member Base",
+        leftAsk: "Who is joining and staying in Kizuna?",
+        left: ["New Yamaha owners", "Long-term customers", "Chapter and ride-group members"],
+        leftW: [[0.36, 0.40, 0.24], [0.34, 0.40, 0.26], [0.32, 0.40, 0.28], [0.30, 0.38, 0.32], [0.28, 0.36, 0.36], [0.29, 0.37, 0.34], [0.33, 0.40, 0.27]],
+        rightTitle: "Engagement Mix",
+        rightAsk: "How are members taking part?",
+        rightNoun: "activity",
+        right: ["Owner meets and rides", "Service touchpoints", "Repeat participation"],
+        rightW: [[0.40, 0.34, 0.26], [0.38, 0.34, 0.28], [0.36, 0.34, 0.30], [0.42, 0.30, 0.28], [0.44, 0.28, 0.28], [0.40, 0.30, 0.30], [0.36, 0.38, 0.26]],
+        topTitle: "Top-performing chapters",
+        topFoot: "Top 5 host points",
+        top: ["Dhaka Central", "Chittagong Port", "Sylhet Hills", "Rajshahi Ride", "Khulna Owners"],
+        topW: [0.22, 0.18, 0.15, 0.12, 0.10],
+        lowTitle: "Low / non-performing chapters",
+        low: ["Barisal Bend", "Rangpur Riders", "Mymensingh Meet", "Comilla Loop", "Bogra Owners"],
+        lowCounts: [[1, 1, 0, 0, 0], [1, 0, 1, 0, 0], [1, 1, 0, 0, 1], [1, 0, 1, 0, 0], [0, 1, 1, 1, 0], [1, 0, 1, 0, 0], [0, 0, 0, 1, 0]],
+        classTitle: "Chapter Performance Classification",
+        classHigh: "Strong attendance and regular repeat participation",
+        classLow: "Very low activity for the length of the period",
+        classNone: "Zero activities during the selected period",
+        promos(current, months) {
+          const meets = Math.max(months, Math.round(current / 8));
+          return [
+            ["calendar", "Owner gatherings", fmt(meets), fmt(Math.round(current * 14)) + " members attended"],
+            ["tag", "Member privileges", fmt(Math.round(current * 1.4)), "Privilege claims in the period"],
+            ["handshake", "Host-dealer support", bdt(current * 12000), Math.max(3, Math.round(current / 6)) + " host points responded"]
+          ];
+        },
+        closing(current) {
+          return "Privilege claims were " + fmt(Math.round(current * 1.4)) + " against " + fmt(current) + " touchpoints. Keep privileges tied to a second visit.";
+        }
+      }
+    ];
+
+    const fmt = (n) => Math.round(n).toLocaleString("en-US");
+    const bdt = (n) => {
+      if (n >= 100000) return "BDT " + (n / 100000).toFixed(1) + "L";
+      return "BDT " + fmt(n);
+    };
+
+    function distribute(total, weights) {
+      const raw = weights.map((w) => Math.floor(total * w));
+      let left = total - raw.reduce((sum, n) => sum + n, 0);
+      const order = weights.map((w, i) => [w, i]).sort((a, b) => b[0] - a[0]);
+      for (let i = 0; i < left; i++) raw[order[i % order.length][1]] += 1;
+      return raw;
+    }
+
+    function periodById(id) {
+      return PERIODS.find((p) => p.id === id);
+    }
+
+    function viewFor(project, period) {
+      const indexes = period.ids.map((id) => MONTHS.findIndex((m) => m.id === id));
+      const left = project.left.map(() => 0);
+      const right = project.right.map(() => 0);
+      const top = project.top.map(() => 0);
+      const low = project.low.map(() => 0);
+      let current = 0;
+      let last = 0;
+      indexes.forEach((i) => {
+        current += project.volume[i][0];
+        last += project.volume[i][1];
+        distribute(project.volume[i][0], project.leftW[i]).forEach((n, k) => { left[k] += n; });
+        distribute(project.volume[i][0], project.rightW[i]).forEach((n, k) => { right[k] += n; });
+        project.topW.forEach((w, k) => { top[k] += Math.round(project.volume[i][0] * w); });
+        project.lowCounts[i].forEach((n, k) => { low[k] += n; });
+      });
+      const lifetime = project.lifetimeValue != null
+        ? project.lifetimeValue
+        : project.lifetimeBase + project.volume.reduce((sum, row) => sum + row[0], 0);
+      const growth = last === 0 ? 0 : ((current - last) / last) * 100;
+      return { current, last, left, right, top, low, lifetime, growth, months: indexes.length };
+    }
+
+    let projectId = "tie-up";
+    let periodId = "2026-10";
+
+    const tabs = document.getElementById("tabs");
+    const pills = document.getElementById("pills");
+    const root = document.getElementById("root");
+    const periodLabel = document.getElementById("period-label");
+
+    function meters(names, values) {
+      const max = Math.max(...values, 1);
+      return names.map((name, i) => `
+        <div class="meter">
+          <div class="meter-top"><span>${name}</span><strong>${fmt(values[i])}</strong></div>
+          <div class="track"><div class="fill" style="width:${Math.round((values[i] / max) * 100)}%"></div></div>
+        </div>`).join("");
+    }
+
+    function ranks(names, values, asc) {
+      const rows = names.map((name, i) => ({ name, value: values[i] }));
+      rows.sort((a, b) => asc ? a.value - b.value : b.value - a.value);
+      return `<ol class="rank">${rows.map((row, i) => `
+        <li><span class="n">${i + 1}</span><span>${row.name}</span><span class="val">${fmt(row.value)}</span></li>`).join("")}</ol>`;
+    }
+
+    function renderView() {
+      const project = PROJECTS.find((p) => p.id === projectId);
+      const period = periodById(periodId);
+      const view = viewFor(project, period);
+      const up = view.growth >= 0;
+      const growthText = (up ? "+" : "") + view.growth.toFixed(1) + "%";
+      const leadLeft = project.left.map((name, i) => ({ name, value: view.left[i] })).sort((a, b) => b.value - a.value)[0];
+      const leadRight = project.right.map((name, i) => ({ name, value: view.right[i] })).sort((a, b) => b.value - a.value)[0];
+      const rightShare = Math.round((leadRight.value / Math.max(view.current, 1)) * 100);
+      const topRows = project.top.map((name, i) => ({ name, value: view.top[i] })).sort((a, b) => b.value - a.value);
+      const lowRows = project.low.map((name, i) => ({ name, value: view.low[i] })).sort((a, b) => a.value - b.value);
+      const line = Math.max(2, 2 * view.months);
+      const highN = topRows.filter((row) => row.value > line).length;
+      const lowN = lowRows.filter((row) => row.value > 0 && row.value <= line).length;
+      const noneN = lowRows.filter((row) => row.value === 0).length;
+      const zeros = lowRows.filter((row) => row.value === 0).map((row) => row.name);
+      const maxBar = Math.max(...project.volume.map((row) => row[0]));
+      const selected = new Set(period.ids);
+      const bars = MONTHS.map((month, i) => {
+        const value = project.volume[i][0];
+        const on = selected.has(month.id) ? " on" : "";
+        return `<button class="bar-col${on}" type="button" data-period="${month.id}" aria-label="${month.name}, ${fmt(value)} ${project.unit}">
+          <span class="bar-val">${fmt(value)}</span>
+          <span class="bar-track"><span class="bar-fill" style="height:${Math.max(8, Math.round((value / maxBar) * 100))}%"></span></span>
+          <span class="bar-name">${month.short}</span>
+        </button>`;
+      }).join("");
+      const promo = project.promos(view.current, view.months).map((item) => `
+        <article class="promo">
+          <div class="ico">${ICONS[item[0]]}</div>
+          <h3>${item[1]}</h3>
+          <p class="stat">${item[2]}</p>
+          <p>${item[3]}</p>
+        </article>`).join("");
+      const quiet = zeros.length
+        ? zeros.length + " watch-list " + (zeros.length === 1 ? "account" : "accounts") + " had no " + project.unit + ". Start with " + zeros.slice(0, 2).join(" and ") + "."
+        : "Every watch-list account recorded some activity. The lightest was " + lowRows[0].name + " at " + fmt(lowRows[0].value) + ".";
+      const compare = up
+        ? period.name + " is " + growthText + " versus " + period.ly + "."
+        : period.name + " is " + growthText + " versus " + period.ly + ".";
+      const note = period.partial ? "Month to date, through 13 Oct" : "Selected period";
+
+      periodLabel.innerHTML = period.name + "<br />Versus " + period.ly;
+
+      root.innerHTML = `
+        <section class="panel active" aria-label="${project.tab}">
+          <h2 class="slide-title">${project.slide1}</h2>
+          <article class="card">
+            <h3 class="kicker">${project.program}</h3>
+            <p class="subhead">Overall performance | ${period.name} | Year-on-year growth</p>
+            <div class="kpis">
+              <div class="kpi">
+                <p class="kpi-label">${project.lifetimeLabel}</p>
+                <p class="kpi-value">${fmt(view.lifetime)}</p>
+                <p class="kpi-note">Since program launch</p>
+              </div>
+              <div class="kpi">
+                <p class="kpi-label">${period.name}</p>
+                <p class="kpi-value">${fmt(view.current)}</p>
+                <p class="kpi-note">${period.partial ? note : project.periodLabel}</p>
+              </div>
+              <div class="kpi">
+                <p class="kpi-label">${period.ly}</p>
+                <p class="kpi-value">${fmt(view.last)}</p>
+                <p class="kpi-note">Comparable period</p>
+              </div>
+              <div class="kpi">
+                <p class="kpi-label">YoY growth</p>
+                <p class="kpi-value ${up ? "up" : "down"}">${growthText}</p>
+                <p class="kpi-note">Versus last year</p>
+              </div>
+            </div>
+            <div class="chart-head"><strong>${project.periodLabel} by month</strong><span>April–October 2026 · click a month</span></div>
+            <div class="chart">${bars}</div>
+          </article>
+
+          <article class="card block">
+            <h3 class="section-title" style="margin-top:0">${project.profile}</h3>
+            <div class="split">
+              <div class="col">
+                <h3>${project.leftTitle}</h3>
+                <p class="ask">${project.leftAsk}</p>
+                ${meters(project.left, view.left)}
+              </div>
+              <div class="col">
+                <h3>${project.rightTitle}</h3>
+                <p class="ask">${project.rightAsk}</p>
+                ${meters(project.right, view.right)}
+              </div>
+            </div>
+            <p class="insight"><strong>Key insight:</strong> ${leadLeft.name} led with ${fmt(leadLeft.value)} ${project.unit}. ${leadRight.name} led the ${project.rightNoun} mix, at ${rightShare}% of the period.</p>
+          </article>
+
+          <h2 class="slide-title">${project.slide2}</h2>
+          <article class="card">
+            <h3 class="kicker">${project.activation}</h3>
+            <div class="pair">
+              <div class="inset">
+                <div class="ico">${ICONS.trophy}</div>
+                <h3>${project.topTitle}</h3>
+                <p>Highest volume, contribution and consistency.</p>
+                ${ranks(project.top, view.top, false)}
+                <div class="foot">${project.topFoot}</div>
+              </div>
+              <div class="inset">
+                <div class="ico">${ICONS.bars}</div>
+                <h3>${project.lowTitle}</h3>
+                <p>Watch list, lightest activity first.</p>
+                ${ranks(project.low, view.low, true)}
+                <div class="foot">${noneN} at zero in this period</div>
+              </div>
+            </div>
+          </article>
+
+          <h3 class="section-title">${project.classTitle}</h3>
+          <table>
+            <thead><tr><th>Category</th><th>Tracked</th><th>Suggested assessment</th></tr></thead>
+            <tbody>
+              <tr><td>High performer</td><td>${highN}</td><td>${project.classHigh}</td></tr>
+              <tr><td>Low performer</td><td>${lowN}</td><td>${project.classLow}</td></tr>
+              <tr><td>Non-performer</td><td>${noneN}</td><td>${project.classNone}</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="section-title">Promotional Activities & Support</h3>
+          <div class="promos">${promo}</div>
+
+          <h3 class="section-title">Management Takeaways</h3>
+          <div class="takeaways"><ul>
+            <li>${topRows[0].name} led with ${fmt(topRows[0].value)} ${project.unit}. Carry that pattern to the next accounts.</li>
+            <li>${quiet}</li>
+            <li>${compare}</li>
+            <li>${project.closing(view.current)}</li>
+          </ul></div>
+        </section>`;
+    }
+
+    tabs.innerHTML = PROJECTS.map((project) =>
+      `<button role="tab" id="tab-${project.id}" type="button" aria-selected="false">${project.tab}</button>`
+    ).join("");
+
+    pills.innerHTML = PERIODS.map((period) =>
+      `<button type="button" data-period="${period.id}" aria-pressed="false">${period.label}</button>`
+    ).join("");
+
+    function selectProject(id) {
+      projectId = id;
+      PROJECTS.forEach((project) => {
+        const on = project.id === id;
+        const button = document.getElementById("tab-" + project.id);
+        button.setAttribute("aria-selected", on ? "true" : "false");
+        button.tabIndex = on ? 0 : -1;
+      });
+      renderView();
+    }
+
+    function selectPeriod(id) {
+      periodId = id;
+      document.querySelectorAll("#pills [data-period]").forEach((button) => {
+        button.setAttribute("aria-pressed", button.dataset.period === id ? "true" : "false");
+      });
+      renderView();
+    }
+
+    tabs.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      selectProject(button.id.replace("tab-", ""));
+    });
+
+    document.body.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-period]");
+      if (!button || button.closest("#tabs")) return;
+      selectPeriod(button.dataset.period);
+    });
+
+    const fromHash = location.hash.replace("#", "");
+    selectPeriod("2026-10");
+    selectProject(PROJECTS.some((project) => project.id === fromHash) ? fromHash : "tie-up");
+  </script>
+</body>
+</html>
