@@ -239,8 +239,8 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .kpi-value.up { color: #17663a; }
-    .kpi-value.down { color: #9f2d2d; }
+    .kpi-value.up, .num.up { color: #17663a; }
+    .kpi-value.down, .num.down { color: #9f2d2d; }
 
     .kpi-note {
       margin: 6px 0 0;
@@ -301,6 +301,7 @@
     .chart-head {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 12px;
       margin: 22px 0 10px;
       font-size: 13.5px;
@@ -323,6 +324,35 @@
     }
 
     .chart.years { grid-template-columns: repeat(3, 1fr); }
+
+    .chart.m13 {
+      grid-template-columns: repeat(13, 62px);
+      min-width: max-content;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 18px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 6px;
+      border-radius: 2px;
+      vertical-align: -1px;
+    }
+
+    .swatch.winter { background: #1b2748; }
+    .swatch.spring { background: #2f6fed; }
+    .swatch.offer { background: #b42318; }
+
+    .act { display: block; font-size: 11px; }
 
     .bar-col {
       appearance: none;
@@ -359,6 +389,9 @@
     }
 
     .bar-col.on .bar-fill { background: var(--yamaha); }
+    .bar-col.winter .bar-fill { background: #1b2748; }
+    .bar-col.spring .bar-fill { background: #2f6fed; }
+    .bar-col.offer .bar-fill { background: #b42318; }
     .bar-col.on .bar-val,
     .bar-col.on { color: var(--yamaha); }
 
@@ -468,6 +501,28 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .table-scroll { overflow-x: auto; }
+
+    table.nums { font-size: 13px; }
+
+    table.nums th,
+    table.nums td {
+      white-space: nowrap;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    table.nums th:nth-child(n + 3),
+    table.nums td:nth-child(n + 3) {
+      width: auto;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      padding-left: 12px;
+    }
+
+    tr.pick td { background: #f4f6fb; }
+    tr.total td { font-weight: 700; }
+
     .promo .stat {
       margin: 10px 0 0;
       font-size: 26px;
@@ -534,7 +589,7 @@
         <img src="yamaha-logo-mark.png" alt="Yamaha" />
         <div class="brand-copy">
           <strong>Projects Performance Dashboard</strong>
-          <span>Six program reviews in one pack</span>
+          <span>Seven program reviews in one pack</span>
         </div>
       </div>
       <div class="period" id="period-label">October 2026<br />Year-on-year growth</div>
@@ -808,6 +863,10 @@
       {
         id: "exchange",
         tab: "Exchange"
+      },
+      {
+        id: "apparels",
+        tab: "Apparels"
       }
     ];
 
@@ -915,6 +974,72 @@
       ["FY 26-27", "Q2", 367, "-87.0%"]
     ];
 
+    const AP_MONTHS = [
+      { id: "2025-09", short: "Sep", yy: "25", name: "September 2025", regime: "winter", retail: 123, bill: 232750, liftAdd: 3200, cumLift: 3200, stocked: 44, active: 24, activePct: "54.5%", cumSt: "3.84%", dlrBal: 3077 },
+      { id: "2025-10", short: "Oct", yy: "25", name: "October 2025", regime: "winter", retail: 55, bill: 100330, liftAdd: 30, cumLift: 3230, stocked: 46, active: 18, activePct: "39.1%", cumSt: "5.51%", dlrBal: 3052 },
+      { id: "2025-11", short: "Nov", yy: "25", name: "November 2025", regime: "winter", retail: 86, bill: 158150, liftAdd: 150, cumLift: 3380, stocked: 47, active: 16, activePct: "34.0%", cumSt: "7.81%", dlrBal: 3116 },
+      { id: "2025-12", short: "Dec", yy: "25", name: "December 2025", regime: "winter", retail: 33, bill: 54700, liftAdd: 50, cumLift: 3430, stocked: 47, active: 13, activePct: "27.7%", cumSt: "8.66%", dlrBal: 3133 },
+      { id: "2026-01", short: "Jan", yy: "26", name: "January 2026", regime: "winter", retail: 44, bill: 77010, liftAdd: 15, cumLift: 3445, stocked: 47, active: 16, activePct: "34.0%", cumSt: "9.90%", dlrBal: 3104 },
+      { id: "2026-02", short: "Feb", yy: "26", name: "February 2026", regime: "winter", retail: 26, bill: 45110, liftAdd: 29, cumLift: 3474, stocked: 50, active: 12, activePct: "24.0%", cumSt: "10.56%", dlrBal: 3107 },
+      { id: "2026-03", short: "Mar", yy: "26", name: "March 2026", regime: "spring", retail: 150, bill: 246610, liftAdd: 0, cumLift: 3474, stocked: 50, active: 23, activePct: "46.0%", cumSt: "14.88%", dlrBal: 2957 },
+      { id: "2026-04", short: "Apr", yy: "26", name: "April 2026", regime: "spring", retail: 122, bill: 211010, liftAdd: 15, cumLift: 3489, stocked: 50, active: 30, activePct: "60.0%", cumSt: "18.31%", dlrBal: 2850 },
+      { id: "2026-05", short: "May", yy: "26", name: "May 2026", regime: "spring", retail: 198, bill: 338280, liftAdd: 190, cumLift: 3679, stocked: 52, active: 33, activePct: "63.5%", cumSt: "22.75%", dlrBal: 2842 },
+      { id: "2026-06", short: "Jun", yy: "26", name: "June 2026", regime: "offer", retail: 184, bill: 318630, liftAdd: 137, cumLift: 3816, stocked: 57, active: 23, activePct: "40.4%", cumSt: "26.76%", dlrBal: 2795, row: "Jun 2026 (Offer launch)" },
+      { id: "2026-07", short: "Jul", yy: "26", name: "July 2026", regime: "offer", retail: 135, bill: 268210, liftAdd: 115, cumLift: 3931, stocked: 61, active: 19, activePct: "31.1%", cumSt: "29.41%", dlrBal: 2775 },
+      { id: "2026-08", short: "Aug", yy: "26", name: "August 2026", regime: "offer", retail: 73, bill: 120380, liftAdd: 96, cumLift: 4027, stocked: 64, active: 23, activePct: "35.9%", cumSt: "30.52%", dlrBal: 2798 },
+      { id: "2026-09", short: "Sep", yy: "26", name: "September 2026", regime: "offer", retail: 66, bill: 110570, liftAdd: 21, cumLift: 4048, stocked: 66, active: 21, activePct: "31.8%", cumSt: "31.99%", dlrBal: 2753 }
+    ];
+
+    const AP_WINTER = ["2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02"];
+    const AP_SPRING = ["2026-03", "2026-04", "2026-05"];
+    const AP_OFFER_IDS = ["2026-06", "2026-07", "2026-08", "2026-09"];
+
+    const AP_PERIODS = [
+      { id: "all", pin: true, label: "All", name: "Sep 2025–Sep 2026", ids: AP_MONTHS.map((month) => month.id) },
+      { id: "winter", pin: true, label: "Launch & winter", name: "Launch & winter slump", ids: AP_WINTER },
+      { id: "spring", pin: true, label: "Spring push", name: "Spring / visit push", ids: AP_SPRING },
+      { id: "offer", pin: true, label: "Offer window", name: "June offer & incentive", ids: AP_OFFER_IDS },
+      ...AP_MONTHS.map((month) => ({ id: month.id, pin: false, label: month.short + " " + month.yy, name: month.name, ids: [month.id] }))
+    ];
+
+    const AP_STYLES = [
+      ["YAPL1", "Blue/Black Checkered Polo", 1200, 700, 206, 494, 500, "29.43%", "17.17%", 1491000],
+      ["YAPL2", "Blue/White Racing Polo", 1200, 725, 189, 536, 475, "26.07%", "15.75%", 1395180],
+      ["YAPL3", "Blue Gradient Stripe Polo", 1000, 698, 175, 523, 302, "25.07%", "17.50%", 684750],
+      ["YAPL4", "Blue/Black Yamalube Polo", 1200, 740, 164, 576, 460, "22.16%", "13.67%", 1377880],
+      ["YAPL5", "Black/Red Collar Polo", 1400, 910, 408, 502, 490, "44.84%", "29.14%", 1934400],
+      ["YAPL1–YAPL5", "Polo shirts", 6000, 3773, 1142, 2631, 2227, "30.27%", "19.03%", 6883210, "total"],
+      ["YAWB1", "Blue/Black Windbreaker", 4000, 275, 153, 122, 3725, "55.64%", "3.83%", 5385800],
+      ["All styles", "Grand total", 10000, 4048, 1295, 2753, 5952, "31.99%", "12.95%", 12269010, "total"]
+    ];
+
+    const AP_GAPS = [
+      ["YAPL1", -130, "June offer"],
+      ["YAPL2", 20, "June offer"],
+      ["YAPL3", -250, "June offer"],
+      ["YAPL4", -130, "June offer"],
+      ["YAPL5", -480, "June offer"],
+      ["YAWB1", 200, "No offer"]
+    ];
+
+    const AP_PRICE = [
+      ["> 1,500 BDT", 7, "7.4%"],
+      ["1,201–1,500 BDT", 40, "42.1%"],
+      ["1,001–1,200 BDT", 28, "29.5%"],
+      ["801–1,000 BDT", 12, "12.6%"],
+      ["≤ 800 BDT", 8, "8.4%"]
+    ];
+
+    const AP_PAIN = [
+      ["Price unjustified", 103, "88.0%"],
+      ["Zero staff push, self-bought", 117, "100%"],
+      ["Marketing promo requested", 24, "20.5%"],
+      ["Sticker / print peeling", 13, "11.1%"],
+      ["New design / color requested", 10, "8.5%"],
+      ["Fabric pilling / discomfort", 8, "6.8%"],
+      ["Loose thread / sewing", 2, "1.7%"]
+    ];
+
     const fmt = (n) => Math.round(n).toLocaleString("en-US");
     const bdt = (n) => {
       if (n >= 100000) return "BDT " + (n / 100000).toFixed(1) + "L";
@@ -930,7 +1055,9 @@
     }
 
     function activePeriods() {
-      return projectId === "exchange" ? EX_PERIODS : PERIODS;
+      if (projectId === "exchange") return EX_PERIODS;
+      if (projectId === "apparels") return AP_PERIODS;
+      return PERIODS;
     }
 
     function periodById(id) {
@@ -1099,6 +1226,151 @@
         </section>`;
     }
 
+    function renderApparels() {
+      const period = periodById(periodId);
+      const chosen = new Set(period.ids);
+      const months = AP_MONTHS.filter((month) => chosen.has(month.id));
+      const retail = months.reduce((sum, month) => sum + month.retail, 0);
+      const bill = months.reduce((sum, month) => sum + month.bill, 0);
+      const lift = months.reduce((sum, month) => sum + month.liftAdd, 0);
+      const one = months.length === 1 ? months[0] : null;
+      const prior = one ? AP_MONTHS[AP_MONTHS.findIndex((month) => month.id === one.id) - 1] : null;
+      const mom = prior ? ((one.retail - prior.retail) / prior.retail) * 100 : null;
+      const avg = (retail / months.length).toFixed(1);
+      const taka = (n) => "BDT " + fmt(n);
+      const liftText = (n) => n === 0 ? "0" : (n > 0 ? "+" : "") + fmt(n);
+      const regimeName = { winter: "Winter", spring: "Spring", offer: "Offer" };
+      const mark = period.id !== "all";
+      const maxBar = 198;
+      const bars = AP_MONTHS.map((month) => {
+        const on = mark && chosen.has(month.id) ? " on" : "";
+        return `<button class="bar-col ${month.regime}${on}" type="button" data-period="${month.id}" aria-label="${month.name}, ${fmt(month.retail)} units retailed, ${month.activePct} of stocked dealers active">
+          <span class="bar-val">${fmt(month.retail)}<span class="act">${month.activePct}</span></span>
+          <span class="bar-track"><span class="bar-fill" style="height:${Math.max(8, Math.round((month.retail / maxBar) * 100))}%"></span></span>
+          <span class="bar-name">${month.short}<br>${month.yy}</span>
+        </button>`;
+      }).join("");
+      const monthRows = AP_MONTHS.map((month) => {
+        const pick = mark && chosen.has(month.id) ? " class=\"pick\"" : "";
+        return `<tr${pick}><td>${month.row || month.short + " " + month.yy}</td><td>${regimeName[month.regime]}</td><td>${fmt(month.cumLift)}</td><td>${liftText(month.liftAdd)}</td><td>${fmt(month.retail)}</td><td>${fmt(month.bill)}</td><td>${fmt(month.stocked)}</td><td>${fmt(month.active)}</td><td>${month.activePct}</td><td>${month.cumSt}</td><td>${fmt(month.dlrBal)}</td></tr>`;
+      }).join("");
+      const styleRows = AP_STYLES.map((row) => `<tr class="${row[10] || ""}"><td>${row[0]}</td><td>${row[1]}</td><td>${fmt(row[2])}</td><td>${fmt(row[3])}</td><td>${fmt(row[4])}</td><td>${fmt(row[5])}</td><td>${fmt(row[6])}</td><td>${row[7]}</td><td>${row[8]}</td><td>${fmt(row[9])}</td></tr>`).join("");
+      const gapRows = AP_GAPS.map(([style, gap, note]) => {
+        const up = gap > 0;
+        return `<tr><td>${style}</td><td>${note}</td><td><span class="num ${up ? "up" : "down"}">${up ? "+" : ""}${fmt(gap)}</span></td></tr>`;
+      }).join("");
+      let kpis;
+      let labelNote;
+      if (period.id === "all") {
+        labelNote = "13-month apparel review";
+        kpis = [
+          ["Procured", "10,000", "Fixed production lots"],
+          ["Lifted to dealers", "4,048", "31.99% of lifted stock sold"],
+          ["Retailed", "1,295", taka(2281740) + " · 12.95% of procured"],
+          ["Unsold", "8,705", "87.1% of procured · " + taka(12269010)]
+        ];
+      } else if (one) {
+        labelNote = prior ? "Versus " + prior.name : "First month in the report";
+        const momText = mom == null ? "—" : (mom >= 0 ? "+" : "") + mom.toFixed(1) + "%";
+        const momClass = mom == null ? "" : mom >= 0 ? " up" : " down";
+        kpis = [
+          [one.name + " retail", fmt(one.retail), "Units sold"],
+          ["Month on month", momText, prior ? "Versus " + prior.short + " " + prior.yy : "No earlier month", momClass],
+          ["Retail billing", taka(one.bill), "For this month"],
+          ["Active dealers", one.active + " of " + one.stocked, one.activePct + " of stocked dealers"]
+        ];
+      } else {
+        labelNote = period.id === "offer"
+          ? "Retail fell from 184 in June to 66 in September"
+          : "Average " + avg + " units per month";
+        kpis = [
+          ["Retail units", fmt(retail), months.length + " months"],
+          ["Average per month", avg, period.id === "offer" ? "June 184 down to September 66" : "Units per month"],
+          ["Retail billing", taka(bill), "Sum of the months in view"],
+          ["Lift added", liftText(lift), "Units sent to dealers"]
+        ];
+      }
+      const kpiHtml = kpis.map(([label, value, note, extra]) => `
+        <div class="kpi">
+          <p class="kpi-label">${label}</p>
+          <p class="kpi-value${extra || ""}">${value}</p>
+          <p class="kpi-note">${note}</p>
+        </div>`).join("");
+      periodLabel.innerHTML = period.name + "<br />" + labelNote;
+      root.innerHTML = `
+        <section class="panel active" aria-label="Apparels">
+          <h2 class="slide-title">Slide 1: Apparels — Retail & Dealer Activation</h2>
+          <article class="card">
+            <h3 class="kicker">Apparel program</h3>
+            <p class="subhead">September 2025–September 2026 · 10,000 units procured · 4,048 lifted · 5,952 still in the warehouse</p>
+            <div class="kpis">${kpiHtml}</div>
+            <div class="chart-head"><strong>Monthly retail units and active-dealer share</strong><span>Click a month</span></div>
+            <div class="chart-scroll"><div class="chart m13">${bars}</div></div>
+            <div class="legend">
+              <span><i class="swatch winter"></i>Launch & winter · avg 61.2 units</span>
+              <span><i class="swatch spring"></i>Spring / visit push · avg 156.7 units</span>
+              <span><i class="swatch offer"></i>June offer & incentive · 184 down to 66</span>
+            </div>
+            <p class="insight"><strong>Key insight:</strong> May 2026 was the retail peak at 198 units, with 33 of 52 stocked dealers selling (63.5%). After the June offer, monthly retail fell from 184 to 66 by September, while stocked dealers rose from 57 to 66 and the active share fell from 40.4% to 31.8%.</p>
+          </article>
+
+          <h3 class="section-title">Channel by month</h3>
+          <div class="table-scroll">
+            <table class="plain nums">
+              <thead><tr><th>Month</th><th>Regime</th><th>Cum lift</th><th>Lift add</th><th>Retail</th><th>Retail BDT</th><th>Stocked</th><th>Active</th><th>Active %</th><th>Cum ST%</th><th>Balance</th></tr></thead>
+              <tbody>${monthRows}</tbody>
+              <tfoot><tr class="total"><td>13-month total</td><td></td><td>4,048</td><td>+4,048</td><td>1,295</td><td>2,281,740</td><td>66</td><td>55 ever</td><td>40.9% avg</td><td>31.99%</td><td>2,753</td></tr></tfoot>
+            </table>
+          </div>
+          <p class="insight">Cum ST% is retail divided by cumulative lift. Dealer balance is cumulative lift minus cumulative retail. The 40.9% figure is the average active rate printed in the review. 55 dealers sold in at least one month.</p>
+
+          <h2 class="slide-title">Slide 2: Apparels — Inventory, Price & the June Offer</h2>
+          <article class="card">
+            <h3 class="kicker">Style-wise stock</h3>
+            <p class="subhead">Full book · 10,000 procured · shares do not change with the month filter</p>
+            <div class="table-scroll">
+              <table class="plain nums">
+                <thead><tr><th>Style</th><th>Description</th><th>Procured</th><th>Lifted</th><th>Sold</th><th>Dealer stock</th><th>Warehouse</th><th>Lift ST%</th><th>Total ST%</th><th>Unsold BDT</th></tr></thead>
+                <tbody>${styleRows}</tbody>
+              </table>
+            </div>
+            <p class="insight"><strong>Key insight:</strong> 8,705 of 10,000 procured units are still unsold (87.1%), worth BDT 12,269,010. YAPL5 leads the polos at 408 sold (44.84% of what dealers lifted). YAWB1 has 4,000 procured and only 275 lifted, so its 55.64% lift sell-through still leaves 3,725 in the warehouse and a 3.83% sell-through on the full lot.</p>
+          </article>
+
+          <article class="card block">
+            <h3 class="section-title" style="margin-top:0">What buyers said</h3>
+            <div class="split">
+              <div class="col">
+                <h3>Ceiling price</h3>
+                <p class="ask">95 numeric responses. 92.6% cap the price at or below 1,500 BDT.</p>
+                ${meters(AP_PRICE.map((row) => row[0] + " · " + row[2]), AP_PRICE.map((row) => row[1]))}
+              </div>
+              <div class="col">
+                <h3>Pain points</h3>
+                <p class="ask">117 buyer contacts. Physical defects together are 19.65%.</p>
+                ${meters(AP_PAIN.map((row) => row[0] + " · " + row[2]), AP_PAIN.map((row) => row[1]))}
+              </div>
+            </div>
+            <p class="insight">88.0% called the price unjustified (103 of 117). Every contact said the purchase was self-bought, so staff push was zero. Physical defects are sticker or print peeling (13), fabric pilling (8), and loose thread or sewing (2).</p>
+          </article>
+
+          <h3 class="section-title">June 2026 offer versus dealer lifting price</h3>
+          <table class="plain">
+            <thead><tr><th>Style</th><th>Offer</th><th>Net vs DP, BDT</th></tr></thead>
+            <tbody>${gapRows}</tbody>
+          </table>
+          <p class="insight">The source chart compares original MRP, the June offer MRP, the dealer lifting price, and net price after the staff incentive. Only the gap between that net price and the lifting price is printed. The net sits below the lifting price on four of the five polos. YAPL2 is 20 above it. YAWB1 had no offer and nets 200 above the lifting price.</p>
+
+          <h3 class="section-title">Management takeaways</h3>
+          <div class="takeaways"><ul>
+            <li>1,295 units retailed from 4,048 lifted and 10,000 procured. Sell-through is 31.99% of lifted stock and 12.95% of the full lots. Unsold value is BDT 12,269,010.</li>
+            <li>The spring visit push averaged 156.7 units a month and peaked at 198 in May, when 63.5% of stocked dealers were active. The launch and winter months averaged 61.2.</li>
+            <li>The June offer did not hold. Retail went 184, 135, 73, 66 from June to September, and the active share ended at 31.8% of 66 stocked dealers.</li>
+            <li>YAPL5 is the strongest polo. The windbreaker lot is the stock problem: 3,725 of 4,000 units never left the warehouse. Buyers’ price ceiling and a zero staff push sit behind the slow sell-through.</li>
+          </ul></div>
+        </section>`;
+    }
+
     function viewFor(project, period) {
       const indexes = period.ids.map((id) => MONTHS.findIndex((m) => m.id === id));
       const left = project.left.map(() => 0);
@@ -1149,6 +1421,10 @@
     function renderView() {
       if (projectId === "exchange") {
         renderExchange();
+        return;
+      }
+      if (projectId === "apparels") {
+        renderApparels();
         return;
       }
       const project = PROJECTS.find((p) => p.id === projectId);
@@ -1292,19 +1568,26 @@
     ).join("");
 
     function renderPills() {
-      const list = projectId === "exchange" ? EX_PERIODS.filter((period) => period.pin) : PERIODS;
+      const list = projectId === "exchange"
+        ? EX_PERIODS.filter((period) => period.pin)
+        : projectId === "apparels"
+          ? AP_PERIODS.filter((period) => period.pin)
+          : PERIODS;
       pills.innerHTML = list.map((period) =>
         `<button type="button" data-period="${period.id}" aria-pressed="false">${period.label}</button>`
       ).join("");
-      document.getElementById("sample").textContent = projectId === "exchange"
+      const sample = document.getElementById("sample");
+      sample.textContent = projectId === "exchange"
         ? "Exchange figures from the review report"
-        : "Sample data for review";
+        : projectId === "apparels"
+          ? "Apparel figures from the review report"
+          : "Sample data for review";
     }
 
     function selectProject(id) {
       projectId = id;
-      if (id === "exchange") {
-        const pinned = EX_PERIODS.some((period) => period.pin && period.id === periodId);
+      if (id === "exchange" || id === "apparels") {
+        const pinned = activePeriods().some((period) => period.pin && period.id === periodId);
         if (!pinned) periodId = "all";
       } else if (!PERIODS.some((period) => period.id === periodId)) {
         periodId = "2026-10";
