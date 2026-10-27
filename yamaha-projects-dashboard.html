@@ -130,6 +130,28 @@
       letter-spacing: -0.015em;
     }
 
+    .live-row { margin: -2px 0 14px; }
+
+    .live-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      background: var(--yamaha);
+      text-decoration: none;
+      font-weight: 650;
+      font-size: 14px;
+      padding: 8px 14px;
+      border-radius: 999px;
+    }
+
+    .live-link:hover { background: #1d2b78; }
+
+    .live-link:focus-visible {
+      outline: 2px solid var(--yamaha);
+      outline-offset: 3px;
+    }
+
     .panel { display: none; }
     .panel.active { display: block; }
 
@@ -1073,6 +1095,7 @@
       root.innerHTML = `
         <section class="panel active" aria-label="Exchange">
           <h2 class="slide-title">Slide 1: Exchange — Performance & Customer Insights</h2>
+          <p class="live-row"><a class="live-link" href="https://app.powerbi.com/groups/me/reports/d9fd591e-2d36-4f33-901b-be8fa7a79d9f/d2054912288ea3588a00?ctid=97c5d789-2a67-4bf3-9317-6fae89c1da10&amp;openReportSource=ReportInvitation&amp;experience=power-bi" target="_blank" rel="noopener noreferrer">Open the live Exchange dashboard in Power BI</a></p>
           <article class="card">
             <h3 class="kicker">Exchange Program</h3>
             <p class="subhead">Overall performance | ${period.name} | Year-on-year growth</p>

@@ -54,6 +54,8 @@ Exchange runs from July 2024 through October 2026 (18,702 exchanges). Brand, mod
 
 FY 26-27 is July through October 2026 only. October 2026 is month-to-date through 13 October.
 
+The Exchange tab links to the live report: [Exchange dashboard in Power BI](https://app.powerbi.com/groups/me/reports/d9fd591e-2d36-4f33-901b-be8fa7a79d9f/d2054912288ea3588a00?ctid=97c5d789-2a67-4bf3-9317-6fae89c1da10&openReportSource=ReportInvitation&experience=power-bi).
+
 Apparels runs from September 2025 through September 2026 (10,000 units procured, 1,295 retailed):
 
 - **All** — the 13-month review
