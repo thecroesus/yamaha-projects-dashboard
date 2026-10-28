@@ -1,10 +1,14 @@
 # Yamaha Projects Dashboard
 
-Performance review for nine Yamaha programs. Open `yamaha-projects-dashboard.html` in a browser. No install or server is required.
+Performance review for nine Yamaha programs.
+
+**Live site:** [thecroesus.github.io/yamaha-projects-dashboard/yamaha-projects-dashboard.html](https://thecroesus.github.io/yamaha-projects-dashboard/yamaha-projects-dashboard.html)
+
+You can also open `yamaha-projects-dashboard.html` from this folder in a browser. No install or server is required.
 
 The page uses the Yamaha wordmark and a white layout. Influencer uses sample data. The other eight tabs use the figures from their review files.
 
-`index.html` is the original five-program sample pack: Tie-Up, Local Mechanics, Pulse Card, Influencer, and Kizuna.
+`index.html` is the original five-program sample pack: Tie-Up, Local Mechanics, Pulse Card, Influencer, and Kizuna. The site root serves that sample pack; use the link above for the full nine-program review.
 
 ## Programs
 
